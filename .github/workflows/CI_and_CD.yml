@@ -1,0 +1,48 @@
+name: Ci/CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # strategy:
+    #   matrix:
+    #     node-versions: ['16.x','18.x'] 
+    # to check on multiple versions
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node Setup
+        uses: actions/setup-node@v4
+
+      - name: Install the necessary packages
+        run: npm install
+
+      - name: Generate Build
+        run: npm run build
+
+      # Have some test cases involved
+
+      # using action https://github.com/marketplace/actions/aws-deploy-s3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      
+      - name: Deploy static files to AWS S3
+        id: aws-deploy-s3
+        uses: oneyedev/aws-deploy-s3@v2
+        with:
+          region: us-east-2
+          bucket: ${{ secrets.AWS_S3_Bucket }}
+          source: /build
+          target: /frontend-react-app
+    
