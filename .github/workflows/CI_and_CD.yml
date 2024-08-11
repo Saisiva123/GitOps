@@ -30,6 +30,10 @@ jobs:
 
       # using action https://github.com/marketplace/actions/aws-deploy-s3
       - run: echo ${{ secrets.AWS_ACCESS_KEY_ID }} 
+      
+      - name: List current directory contents
+        run: ls -al
+
             
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
