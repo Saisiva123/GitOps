@@ -1,4 +1,4 @@
-name: Ci/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -43,6 +43,6 @@ jobs:
         with:
           region: us-east-2
           bucket: ${{ secrets.AWS_S3_Bucket }}
-          source: /build
-          target: /frontend-react-app
+          source: /build/
+          target: /frontend-react-app/
     
