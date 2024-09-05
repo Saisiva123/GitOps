@@ -5,13 +5,8 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
-
-    # strategy:
-    #   matrix:
-    #     node-versions: ['16.x','18.x'] 
-    # to check on multiple versions
 
     steps:
       - name: Checkout
@@ -23,27 +18,22 @@ jobs:
       - name: Install the necessary packages
         run: npm install
 
+      - name: Run the test cases
+        run: npm run test
+
       - name: Generate Build
         run: npm run build
 
-      # Have some test cases involved
-
-      # using action https://github.com/marketplace/actions/aws-deploy-s3
-      - run: echo ${{ secrets.AWS_ACCESS_KEY_ID }} 
-      
-      - name: List current directory contents
-        run: ls -al
-
-            
+      - name: Check whether the build is ready
+        run : ls -al
+        
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-       
-              
-      
+
       - name: Deploy static files to AWS S3
         id: aws-deploy-s3
         uses: oneyedev/aws-deploy-s3@v2
@@ -51,5 +41,18 @@ jobs:
           region: us-east-2
           bucket: ${{ secrets.AWS_S3_Bucket }}
           source: ./build/
-          target: frontend-react-app/
+          target: frontend/
+
+  invalidate_cloudfront:
+    needs: build_and_deploy
+    runs-on: ubuntu-latest
     
+    if: secrets.CLOUDFRONT_DISTRIBUTION_ID != ''
+    steps:
+    - name: Invalidate CloudFront Cache
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+      run: |
+        aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
