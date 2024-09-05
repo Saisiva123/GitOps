@@ -7,7 +7,7 @@
 
 ### Things to acheive:
 1. Make sure proper testing is done either unit tests or integration tests.
-2. Make sure the PR is closed.
+2. Make sure the PR is closed. +> Once the PR gets merged it closes automatically.
 3. Make sure the branch from which the PR has been created is deleted after successfull PR merge or deployment.
 
 ### Learnings:
