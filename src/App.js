@@ -1,5 +1,5 @@
 import './App.css';
-import bg from '../public/bg.png'
+import bg from './assets/bg.png'
 
 function App() {
   return (
