@@ -47,7 +47,6 @@ jobs:
     needs: build_and_deploy
     runs-on: ubuntu-latest
     
-    if: secrets.CLOUDFRONT_DISTRIBUTION_ID != ''
     steps:
     - name: Invalidate CloudFront Cache
       env:
